@@ -1,0 +1,59 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Square Payment</title>
+    <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script> <!-- Include Square Web Payments SDK -->
+</head>
+<body>
+    <article>
+        <p>Card No: 4111 1111 1111 1111</p>
+        <p>Year: 11/25</p>
+        <p>CVV: 111</p>
+        <p>Zip Code : 10003</p>
+    </article>
+    <form id="payment-form">
+        <input type="text" id="cardholder-name" placeholder="Cardholder Name" />
+        <div id="card-container"></div> <!-- Square card form will be attached here -->
+        <button id="card-button" type="button">Pay</button>
+        <p id="payment-status"></p>
+    </form>
+
+    <script>
+      
+      const appId = 'sandbox-sq0idb-ppQaKuF40zODvoRfRbci2Q'; // Replace with your Application ID
+        const locationId = 'LTMT1YS7ZG0QW'; // Replace with your Location ID
+ 
+        // Initialize the Square card element
+        async function initializeCard() {
+            const payments = window.Square.payments(appId, locationId); // Access the Square payments object from the global scope
+            const card = await payments.card();
+            await card.attach('#card-container'); // Attach the card input to the container
+            return card;
+        }
+
+        // Function to handle the payment process
+        async function handlePayment() {
+            const card = await initializeCard();
+
+            document.querySelector('#card-button').addEventListener('click', async function () {
+                const result = await card.tokenize();
+
+                if (result.status === 'OK') {
+                    console.log('sourceId:', result.token); // Output the sourceId to the console
+                    document.querySelector('#payment-status').textContent = `Payment token generated: ${result.token}`;
+                } else {
+                    document.querySelector('#payment-status').textContent = 'Payment failed';
+                }
+            });
+        }
+
+        // Initialize the payment process on DOM content loaded
+        document.addEventListener('DOMContentLoaded', handlePayment);
+    </script>
+</body>
+</html>
